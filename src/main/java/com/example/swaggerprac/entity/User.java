@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +17,16 @@ public class User {
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
+    private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
+    @Column(nullable = false)
     private Integer age;
 
-    public User(String username, Integer age) {
+    public User(String username, String password, String email ,Integer age) {
         this.username = username;
+        this.password = password;
+        this.email = email;
         this.age = age;
     }
 
