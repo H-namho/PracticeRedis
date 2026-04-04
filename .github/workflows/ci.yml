@@ -38,13 +38,6 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
-    env:
-      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3307/mydb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-      SPRING_DATASOURCE_USERNAME: appuser
-      SPRING_DATASOURCE_PASSWORD: 1234
-      SPRING_DATA_REDIS_HOST: 127.0.0.1
-      SPRING_DATA_REDIS_PORT: 6379
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
