@@ -5,7 +5,7 @@ import com.example.swaggerprac.entity.User;
 
 import java.util.List;
 
-public interface UserRepositryCustom {
+public interface UserRepositoryCustom {
 
     List<User> search(SearchRequestDto searchRequestDto);
 }
