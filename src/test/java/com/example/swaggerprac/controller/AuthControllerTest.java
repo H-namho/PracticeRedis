@@ -1,7 +1,10 @@
 package com.example.swaggerprac.controller;
 
+import com.example.swaggerprac.dto.LoginRequestDto;
+import com.example.swaggerprac.dto.LoginResponseDto;
 import com.example.swaggerprac.dto.SignupRequestDto;
 import com.example.swaggerprac.exception.GlobalExceptionHandler;
+import com.example.swaggerprac.security.jwt.JwtAuthenticationFilter;
 import com.example.swaggerprac.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -36,6 +39,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private AuthService authService;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
     void 회원가입_성공() throws Exception {
@@ -92,5 +98,38 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("이미 존재하는 사용자 이름입니다."));
+    }
+    @Test
+    void 로그인_성공() throws Exception {
+        LoginRequestDto requestDto = new LoginRequestDto("tester", "password123");
+        LoginResponseDto responseDto = new LoginResponseDto(
+                "Bearer",
+                "access-token",
+                "refresh-token"
+        );
+
+        when(authService.login(any(LoginRequestDto.class))).thenReturn(responseDto);
+
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.grantType").value("Bearer"))
+                .andExpect(jsonPath("$.accessToken").value("access-token"))
+                .andExpect(jsonPath("$.refreshToken").value("refresh-token"));
+    }
+
+    @Test
+    void 로그인_실패() throws Exception {
+        LoginRequestDto requestDto = new LoginRequestDto("tester", "wrong-password");
+
+        doThrow(new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다."))
+                .when(authService).login(any(LoginRequestDto.class));
+
+        mockMvc.perform(post("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("아이디 또는 비밀번호가 올바르지 않습니다."));
     }
 }

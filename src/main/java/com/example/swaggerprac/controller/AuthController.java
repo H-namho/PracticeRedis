@@ -1,5 +1,7 @@
 package com.example.swaggerprac.controller;
 
+import com.example.swaggerprac.dto.LoginRequestDto;
+import com.example.swaggerprac.dto.LoginResponseDto;
 import com.example.swaggerprac.dto.SignupRequestDto;
 import com.example.swaggerprac.service.AuthService;
 import jakarta.validation.Valid;
@@ -19,5 +21,10 @@ public class AuthController {
     @PostMapping("/signup")
     public Long  signup(@RequestBody @Valid SignupRequestDto dto){
         return authService.signup(dto);
+    }
+
+    @PostMapping("/login")
+    public LoginResponseDto login(@RequestBody @Valid LoginRequestDto dto){
+        return authService.login(dto);
     }
 }

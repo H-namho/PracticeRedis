@@ -1,5 +1,6 @@
 package com.example.swaggerprac.entity;
 
+import com.example.swaggerprac.entity.enumtype.RoleType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,12 +23,17 @@ public class User extends BaseEntity {
     private String email;
     @Column(nullable = false)
     private Integer age;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoleType role;
 
-    public User(String username, String password, String email ,Integer age) {
+
+    public User(String username, String password, String email ,Integer age,RoleType role) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.age = age;
+        this.role = role;
     }
 
 }
