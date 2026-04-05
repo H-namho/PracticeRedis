@@ -64,6 +64,14 @@ public class JwtUtil {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
 
+    // 남은 만료시간 계산
+    public long getRemainingExpiration(String token) {
+        long expirationTime = extractAllClaims(token).getExpiration().getTime();
+        long currentTime = System.currentTimeMillis();
+
+        return Math.max(expirationTime - currentTime, 0);
+    }
+
     private String createToken(Long userId, String username, long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);

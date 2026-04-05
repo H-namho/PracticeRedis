@@ -1,5 +1,6 @@
 package com.example.swaggerprac.security.jwt;
 
+import com.example.swaggerprac.redis.BlackListAccessToken;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final BlackListAccessToken blackListAccessToken;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -39,6 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
         try {
+            // 블랙리스트에 있나 확인
+            if (blackListAccessToken.contains(token)) {
+                SecurityContextHolder.clearContext(); // 블랙리스트에 있다면 콘텍스트홀더 클리어
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\":\"로그아웃된 토큰입니다.\"}");
+                return;
+            }
             // 이름 추출
             String username = jwtUtil.extractUsername(token);
 
