@@ -33,6 +33,7 @@ public class SecConfig {
                 .requestMatchers(
                         "/api/signup",
                         "/api/login",
+                        "/api/refresh",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**"
