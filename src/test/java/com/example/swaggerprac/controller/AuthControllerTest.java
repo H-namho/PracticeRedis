@@ -3,7 +3,9 @@ package com.example.swaggerprac.controller;
 import com.example.swaggerprac.dto.LoginRequestDto;
 import com.example.swaggerprac.dto.LoginResponseDto;
 import com.example.swaggerprac.dto.SignupRequestDto;
+import com.example.swaggerprac.exception.ConflictException;
 import com.example.swaggerprac.exception.GlobalExceptionHandler;
+import com.example.swaggerprac.exception.UnauthorizedException;
 import com.example.swaggerprac.security.jwt.JwtAuthenticationFilter;
 import com.example.swaggerprac.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,7 +46,7 @@ class AuthControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    void 회원가입_성공() throws Exception {
+    void signupSuccess() throws Exception {
         SignupRequestDto requestDto = new SignupRequestDto(
                 "tester",
                 "password123",
@@ -54,17 +56,17 @@ class AuthControllerTest {
 
         when(authService.signup(any(SignupRequestDto.class))).thenReturn(1L);
 
-        mockMvc.perform(post("/api/signup")
+        mockMvc.perform(post("/api/user/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().string("1"));
 
         verify(authService).signup(any(SignupRequestDto.class));
     }
 
     @Test
-    void 회원가입_검증실패_이메일형식오류() throws Exception {
+    void signupValidationFailure() throws Exception {
         SignupRequestDto requestDto = new SignupRequestDto(
                 "tester",
                 "password123",
@@ -72,7 +74,7 @@ class AuthControllerTest {
                 20
         );
 
-        mockMvc.perform(post("/api/signup")
+        mockMvc.perform(post("/api/user/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isBadRequest())
@@ -82,7 +84,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void 회원가입_중복사용자_예외응답() throws Exception {
+    void signupDuplicateUserReturnsConflict() throws Exception {
         SignupRequestDto requestDto = new SignupRequestDto(
                 "tester",
                 "password123",
@@ -90,17 +92,18 @@ class AuthControllerTest {
                 20
         );
 
-        doThrow(new IllegalArgumentException("이미 존재하는 사용자 이름입니다."))
+        doThrow(new ConflictException("Username already exists."))
                 .when(authService).signup(any(SignupRequestDto.class));
 
-        mockMvc.perform(post("/api/signup")
+        mockMvc.perform(post("/api/user/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("이미 존재하는 사용자 이름입니다."));
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Username already exists."));
     }
+
     @Test
-    void 로그인_성공() throws Exception {
+    void loginSuccess() throws Exception {
         LoginRequestDto requestDto = new LoginRequestDto("tester", "password123");
         LoginResponseDto responseDto = new LoginResponseDto(
                 "Bearer",
@@ -110,7 +113,7 @@ class AuthControllerTest {
 
         when(authService.login(any(LoginRequestDto.class))).thenReturn(responseDto);
 
-        mockMvc.perform(post("/api/login")
+        mockMvc.perform(post("/api/user/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
@@ -120,16 +123,16 @@ class AuthControllerTest {
     }
 
     @Test
-    void 로그인_실패() throws Exception {
+    void loginFailureReturnsUnauthorized() throws Exception {
         LoginRequestDto requestDto = new LoginRequestDto("tester", "wrong-password");
 
-        doThrow(new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다."))
+        doThrow(new UnauthorizedException("Invalid username or password."))
                 .when(authService).login(any(LoginRequestDto.class));
 
-        mockMvc.perform(post("/api/login")
+        mockMvc.perform(post("/api/user/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("아이디 또는 비밀번호가 올바르지 않습니다."));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Invalid username or password."));
     }
 }
