@@ -13,7 +13,7 @@ public class PostEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long postId;
     @JoinColumn(name = "writer_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User writer;
@@ -31,7 +31,9 @@ public class PostEntity extends BaseEntity {
         this.content = content;
         this.viewCount = 0;
     }
-
+    public void increaseViewCount() {
+        ++this.viewCount;
+    }
     public static PostEntity create(String title, User writer, String content) {
         return new PostEntity(title, writer, content);
     }
