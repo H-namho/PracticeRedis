@@ -31,9 +31,9 @@ public class SecConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/api/signup",
-                        "/api/login",
-                        "/api/refresh",
+                        "/api/user/signup",
+                        "/api/user/login",
+                        "/api/user/refresh",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**"
