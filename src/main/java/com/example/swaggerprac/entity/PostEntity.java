@@ -37,5 +37,9 @@ public class PostEntity extends BaseEntity {
     public static PostEntity create(String title, User writer, String content) {
         return new PostEntity(title, writer, content);
     }
+    public void updatePost(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 
 }
