@@ -37,7 +37,9 @@ public class AuthService {
         if (userRepository.existsByUsername(dto.username())) {
             throw new ConflictException("이미 존재하는 회원입니다.");
         }
-
+        if(userRepository.existsByEmail(dto.email())) {
+            throw new ConflictException("이미 존재하는 이메일입니다.");
+        }
         String encodedPassword = passwordEncoder.encode(dto.password());
         User user = new User(
                 dto.username(),
