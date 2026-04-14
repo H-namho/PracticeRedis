@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,6 +27,8 @@ public class PostEntity extends BaseEntity {
     private String content;
     @Column(nullable = false)
     private int viewCount;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostAttachment> attachments = new ArrayList<>();
 
     private PostEntity(String title, User writer, String content) {
         this.title = title;

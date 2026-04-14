@@ -3,6 +3,7 @@ package com.example.swaggerprac.queryDsl;
 import com.example.swaggerprac.dto.PostSearchDto;
 import com.example.swaggerprac.entity.PostEntity;
 import com.example.swaggerprac.entity.QPostEntity;
+import com.example.swaggerprac.entity.QUser;
 import com.example.swaggerprac.entity.enumtype.PostSearchType;
 import com.example.swaggerprac.repository.PostRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -22,15 +23,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public List<PostEntity> SearchPost(PostSearchDto dto) {
 
         QPostEntity post = QPostEntity.postEntity;
+        QUser user = QUser.user;
 
-        return queryFactory.selectFrom(post)
-                .where(search(dto,post)).offset((long)dto.page()*dto.size()).limit(dto.size()).fetch();
+        return queryFactory.selectFrom(post).join(post.writer,user)
+                .fetchJoin().where(search(dto, post)).orderBy(post.createdAt.desc(),post.postId.desc())
+                .offset((long)dto.size()*dto.page()).limit(dto.size()).fetch();
     }
 
     @Override
     public long countSearch(PostSearchDto dto) {
         QPostEntity post = QPostEntity.postEntity;
-        return queryFactory.select(post.count()).from(post).where(search(dto,post)).fetchCount();
+        return queryFactory.select(post.count())
+                .from(post).where(search(dto,post)).fetchCount();
     }
 
     private BooleanExpression search(PostSearchDto dto,QPostEntity post) {
