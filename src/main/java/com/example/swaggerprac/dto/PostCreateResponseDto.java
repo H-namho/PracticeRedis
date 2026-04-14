@@ -1,4 +1,6 @@
 package com.example.swaggerprac.dto;
 
-public record PostCreateResponseDto(Long postId) {
+import java.util.List;
+
+public record PostCreateResponseDto(Long postId, List<PostAttachmentResponseDto> attachments) {
 }
