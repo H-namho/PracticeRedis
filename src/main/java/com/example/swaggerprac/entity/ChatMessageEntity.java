@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Table(name = "chatMessage")
 public class ChatMessageEntity extends BaseEntity{
 
     @Id

@@ -1,4 +1,6 @@
-package com.example.swaggerprac.dto;
+package com.example.swaggerprac.dto.post;
+
+import com.example.swaggerprac.dto.attach.PostAttachmentResponseDto;
 
 import java.util.List;
 

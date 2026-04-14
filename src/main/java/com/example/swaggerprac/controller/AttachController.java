@@ -1,9 +1,6 @@
 package com.example.swaggerprac.controller;
 
-import com.example.swaggerprac.dto.DownloadFileDto;
-import com.example.swaggerprac.entity.PostAttachment;
-import com.example.swaggerprac.exception.ResourceNotFoundException;
-import com.example.swaggerprac.repository.PostAttachmentRepository;
+import com.example.swaggerprac.dto.attach.DownloadFileDto;
 import com.example.swaggerprac.service.AttachService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;

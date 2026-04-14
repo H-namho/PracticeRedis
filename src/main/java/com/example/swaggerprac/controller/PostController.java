@@ -1,6 +1,6 @@
 package com.example.swaggerprac.controller;
 
-import com.example.swaggerprac.dto.*;
+import com.example.swaggerprac.dto.post.*;
 import com.example.swaggerprac.entity.enumtype.PostSearchType;
 import com.example.swaggerprac.service.PostService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -68,7 +68,7 @@ public class PostController {
 
     @GetMapping("/searchPost")
     public ResponseEntity<PostSearchResponseDto> searchPost(@RequestParam PostSearchType type
-                                    , @RequestParam String keyword,@RequestParam @Min(0) int page
+                                    , @RequestParam String keyword, @RequestParam @Min(0) int page
                                     , @RequestParam @Max(30) @Min(1) int size) {
         PostSearchDto dto = new PostSearchDto(type,keyword,page,size);
         return ResponseEntity.ok(postService.searchPost(dto));

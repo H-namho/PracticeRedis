@@ -1,9 +1,9 @@
 package com.example.swaggerprac.service;
 
-import com.example.swaggerprac.dto.LoginRequestDto;
-import com.example.swaggerprac.dto.LoginResponseDto;
-import com.example.swaggerprac.dto.MeResponseDto;
-import com.example.swaggerprac.dto.SignupRequestDto;
+import com.example.swaggerprac.dto.auth.LoginRequestDto;
+import com.example.swaggerprac.dto.auth.LoginResponseDto;
+import com.example.swaggerprac.dto.auth.MeResponseDto;
+import com.example.swaggerprac.dto.auth.SignupRequestDto;
 import com.example.swaggerprac.entity.User;
 import com.example.swaggerprac.entity.enumtype.RoleType;
 import com.example.swaggerprac.exception.ConflictException;
@@ -35,10 +35,10 @@ public class AuthService {
     @Transactional
     public Long signup(SignupRequestDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
-            throw new ConflictException("?대? 議댁옱?섎뒗 ?뚯썝?낅땲??");
+            throw new ConflictException("이미 사용중인 아이디입니다.");
         }
         if (userRepository.existsByEmail(dto.email())) {
-            throw new ConflictException("?대? 議댁옱?섎뒗 ?대찓?쇱엯?덈떎.");
+            throw new ConflictException("이미 사용중인 이메일입니다.");
         }
 
         String encodedPassword = passwordEncoder.encode(dto.password());
@@ -56,10 +56,10 @@ public class AuthService {
     @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto dto) {
         User user = userRepository.findByUsername(dto.username())
-                .orElseThrow(() -> new UnauthorizedException("?꾩씠???먮뒗 鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎."));
+                .orElseThrow(() -> new UnauthorizedException("존재하지 않은 회원입니다."));
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            throw new UnauthorizedException("?꾩씠???먮뒗 鍮꾨?踰덊샇媛 ?쇱튂?섏? ?딆뒿?덈떎.");
+            throw new UnauthorizedException("비밀번호가 일치하지 않습니다.");
         }
 
         String accessToken = jwtUtil.createAccessToken(user.getId(), user.getUsername());

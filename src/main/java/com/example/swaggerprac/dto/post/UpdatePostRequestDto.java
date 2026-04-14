@@ -1,4 +1,4 @@
-package com.example.swaggerprac.dto;
+package com.example.swaggerprac.dto.post;
 
 import jakarta.validation.constraints.NotBlank;
 
