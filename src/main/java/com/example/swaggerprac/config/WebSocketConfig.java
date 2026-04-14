@@ -14,7 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private StompInterceptor stompInterceptor;
+    private final StompInterceptor stompInterceptor;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
