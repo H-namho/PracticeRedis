@@ -1,6 +1,7 @@
 package com.example.swaggerprac.service;
 
 import com.example.swaggerprac.dto.room.DirectRoomRequestDto;
+import com.example.swaggerprac.dto.room.GroupRoomRequestDto;
 import com.example.swaggerprac.entity.ChatRoomEntity;
 import com.example.swaggerprac.entity.ChatRoomMemberEntity;
 import com.example.swaggerprac.entity.User;
@@ -34,7 +35,6 @@ public class ChatRoomService {
     @Transactional
     public Long directCreate(String username, DirectRoomRequestDto dto) {
 
-        log.info("들어옴");
         User user=userRepository.findByUsername(username)
                 .orElseThrow(()-> new UsernameNotFoundException("회원정보를 찾을 수 없습니다."));
         User target = userRepository.findById(dto.targetId())
@@ -57,22 +57,11 @@ public class ChatRoomService {
 
         return room.getRoomId();
     }
+
+//    @Transactional
+//    public Long groupCreate(String username, GroupRoomRequestDto dto) {
+//
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(()-> new UsernameNotFoundException("회원 정보를 찾을 수 없습니다."));
+//    }
 }
-/*        List<ChatRoomMemberEntity> members = chatRoomMemberRepository.findByMember(username);
-        Set<Long> membersRoomId = new HashSet<>();
-        for(ChatRoomMemberEntity c : members){
-            membersRoomId.add(c.getChatRoom().getRoomId());
-        }
-        List<ChatRoomMemberEntity> targets = chatRoomMemberRepository.findByMember(target.getUsername());
-        Set<Long> targetsRoomId = new HashSet<>();
-        for(ChatRoomMemberEntity t : targets){
-            targetsRoomId.add(t.getChatRoom().getRoomId());
-        }
-        membersRoomId.retainAll(targetsRoomId);
-        for(Long m : membersRoomId){
-            ChatRoomEntity room =chatRoomRepository.findById(m)
-                    .orElseThrow(() -> new ResourceNotFoundException("존재하지 않은 방입니다."));
-            if(room.getRoomType()== RoomType.DIRECT){
-                return m;
-            }
-        }*/

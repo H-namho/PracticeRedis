@@ -1,6 +1,7 @@
 package com.example.swaggerprac.controller;
 
 import com.example.swaggerprac.dto.room.DirectRoomRequestDto;
+import com.example.swaggerprac.dto.room.GroupRoomRequestDto;
 import com.example.swaggerprac.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +24,12 @@ public class ChatRoomController {
         Long roomId = chatRoomService.directCreate(username,dto);
 
         return ResponseEntity.ok(roomId);
+    }
+
+    @PostMapping("/group")
+    public ResponseEntity<?> groupCreate(Authentication auth, GroupRoomRequestDto dto){
+
+        String username =auth.getName();
+        Long roomId = chatRoomService.groupCreate(username,dto);
     }
 }
