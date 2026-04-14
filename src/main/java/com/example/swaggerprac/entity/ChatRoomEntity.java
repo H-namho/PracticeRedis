@@ -1,5 +1,6 @@
 package com.example.swaggerprac.entity;
 
+import com.example.swaggerprac.entity.enumtype.RoomType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Table(name = "chatRoom")
 public class ChatRoomEntity extends BaseEntity{
 
     @Id
@@ -23,14 +25,17 @@ public class ChatRoomEntity extends BaseEntity{
     private String roomName;
     @Column(nullable = false)
     private boolean isPrivate;
-
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType;
     private String lastMessage;
     private LocalDateTime lastMessageAt;
 
-    public ChatRoomEntity(User creator, String roomName, boolean isPrivate){
+    public ChatRoomEntity(User creator, String roomName, RoomType roomType,boolean isPrivate){
         this.creator = creator;
         this.roomName = roomName;
         this.isPrivate = isPrivate;
+        this.roomType = roomType;
     }
     public void updateLastMessage(String lastMessage,LocalDateTime lastMessageAt){
         this.lastMessage=lastMessage;

@@ -1,13 +1,13 @@
 package com.example.swaggerprac.service;
 
-import com.example.swaggerprac.dto.PostAttachmentResponseDto;
-import com.example.swaggerprac.dto.PostCreateResponseDto;
-import com.example.swaggerprac.dto.PostSearchDto;
-import com.example.swaggerprac.dto.PostSearchResponseDto;
-import com.example.swaggerprac.dto.PostSummaryResponseDto;
-import com.example.swaggerprac.dto.PostWriteRequestDto;
-import com.example.swaggerprac.dto.ReadPostResponseDto;
-import com.example.swaggerprac.dto.UpdatePostRequestDto;
+import com.example.swaggerprac.dto.attach.PostAttachmentResponseDto;
+import com.example.swaggerprac.dto.post.PostCreateResponseDto;
+import com.example.swaggerprac.dto.post.PostSearchDto;
+import com.example.swaggerprac.dto.post.PostSearchResponseDto;
+import com.example.swaggerprac.dto.post.PostSummaryResponseDto;
+import com.example.swaggerprac.dto.post.PostWriteRequestDto;
+import com.example.swaggerprac.dto.post.ReadPostResponseDto;
+import com.example.swaggerprac.dto.post.UpdatePostRequestDto;
 import com.example.swaggerprac.entity.PostAttachment;
 import com.example.swaggerprac.entity.PostEntity;
 import com.example.swaggerprac.entity.User;

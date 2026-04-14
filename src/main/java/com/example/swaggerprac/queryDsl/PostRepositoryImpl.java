@@ -1,6 +1,6 @@
 package com.example.swaggerprac.queryDsl;
 
-import com.example.swaggerprac.dto.PostSearchDto;
+import com.example.swaggerprac.dto.post.PostSearchDto;
 import com.example.swaggerprac.entity.PostEntity;
 import com.example.swaggerprac.entity.QPostEntity;
 import com.example.swaggerprac.entity.QUser;

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"room_id", "user_id"}))
+@Table(name = "roomMember",uniqueConstraints = @UniqueConstraint(columnNames = {"room_id", "user_id"}))
 public class ChatRoomMemberEntity {
 
     @Id
@@ -19,7 +19,6 @@ public class ChatRoomMemberEntity {
     @JoinColumn(name = "room_id",nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private ChatRoomEntity chatRoom;
-
     @JoinColumn(name = "user_id",nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User member;

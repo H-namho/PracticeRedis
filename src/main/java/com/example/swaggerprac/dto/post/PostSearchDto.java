@@ -1,4 +1,4 @@
-package com.example.swaggerprac.dto;
+package com.example.swaggerprac.dto.post;
 
 import com.example.swaggerprac.entity.enumtype.PostSearchType;
 

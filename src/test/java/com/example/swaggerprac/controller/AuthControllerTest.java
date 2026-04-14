@@ -1,8 +1,8 @@
 package com.example.swaggerprac.controller;
 
-import com.example.swaggerprac.dto.LoginRequestDto;
-import com.example.swaggerprac.dto.LoginResponseDto;
-import com.example.swaggerprac.dto.SignupRequestDto;
+import com.example.swaggerprac.dto.auth.LoginRequestDto;
+import com.example.swaggerprac.dto.auth.LoginResponseDto;
+import com.example.swaggerprac.dto.auth.SignupRequestDto;
 import com.example.swaggerprac.exception.ConflictException;
 import com.example.swaggerprac.exception.GlobalExceptionHandler;
 import com.example.swaggerprac.exception.UnauthorizedException;

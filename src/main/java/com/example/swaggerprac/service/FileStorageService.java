@@ -1,6 +1,6 @@
 package com.example.swaggerprac.service;
 
-import com.example.swaggerprac.dto.PostAttachmentResponseDto;
+import com.example.swaggerprac.dto.attach.PostAttachmentResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
