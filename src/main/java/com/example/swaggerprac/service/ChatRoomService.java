@@ -1,11 +1,13 @@
 package com.example.swaggerprac.service;
 
 import com.example.swaggerprac.dto.room.DirectRoomRequestDto;
+import com.example.swaggerprac.dto.room.GroupRoomRequestDto;
 import com.example.swaggerprac.entity.ChatRoomEntity;
 import com.example.swaggerprac.entity.ChatRoomMemberEntity;
 import com.example.swaggerprac.entity.User;
 import com.example.swaggerprac.entity.enumtype.ChatMemberRoleType;
 import com.example.swaggerprac.entity.enumtype.RoomType;
+import com.example.swaggerprac.exception.ForbiddenException;
 import com.example.swaggerprac.exception.ResourceNotFoundException;
 import com.example.swaggerprac.repository.ChatRoomMemberRepository;
 import com.example.swaggerprac.repository.ChatRoomRepository;
@@ -57,22 +59,41 @@ public class ChatRoomService {
 
         return room.getRoomId();
     }
+    @Transactional
+    public Long groupCreate(String username, GroupRoomRequestDto dto) {
+
+        User user =userRepository.findByUsername(username)
+                .orElseThrow(()-> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+        List<User> targetUsers =userRepository.findAllById(dto.targetIds());
+        if(targetUsers.isEmpty() || targetUsers.size()!=dto.targetIds().size()){
+            throw new ResourceNotFoundException("상대방을 찾을 수 없습니다.");
+        }
+        HashSet<Long> targetIds = new HashSet<>();
+        for(User targetUser : targetUsers){
+            targetIds.add(targetUser.getId());
+        }
+        if(targetIds.contains(user.getId())){
+            throw new IllegalArgumentException("자기자신과 대화할 수 없습니다.");
+        }
+        ChatRoomEntity groupRoom = new ChatRoomEntity(user, dto.roomName(), RoomType.GROUP, dto.isPrivate());
+        chatRoomRepository.save(groupRoom);
+        ChatRoomMemberEntity roomMember = new ChatRoomMemberEntity(groupRoom,user, ChatMemberRoleType.ADMIN);
+        chatRoomMemberRepository.save(roomMember);
+        for(User targetUser : targetUsers){
+            ChatRoomMemberEntity roomTargets = new ChatRoomMemberEntity(groupRoom,targetUser,ChatMemberRoleType.MEMBER);
+            chatRoomMemberRepository.save(roomTargets);
+        }
+        return groupRoom.getRoomId();
+    }
+    @Transactional
+    public void deleteRoom(Long roomId, String username) {
+        ChatRoomEntity room =chatRoomRepository.findById(roomId)
+                .orElseThrow(()-> new ResourceNotFoundException("해당채팅방을 찾을 수 없습니다."));
+        if(!room.getCreator().getUsername().equals(username)){
+            throw new ForbiddenException("관리자만 채팅방을 삭제할 수 있습니다.");
+        }
+        List<ChatRoomMemberEntity> roomMember = chatRoomMemberRepository.findByChatRoom_RoomId(roomId);
+        chatRoomMemberRepository.deleteAll(roomMember);
+        chatRoomRepository.delete(room);
+    }
 }
-/*        List<ChatRoomMemberEntity> members = chatRoomMemberRepository.findByMember(username);
-        Set<Long> membersRoomId = new HashSet<>();
-        for(ChatRoomMemberEntity c : members){
-            membersRoomId.add(c.getChatRoom().getRoomId());
-        }
-        List<ChatRoomMemberEntity> targets = chatRoomMemberRepository.findByMember(target.getUsername());
-        Set<Long> targetsRoomId = new HashSet<>();
-        for(ChatRoomMemberEntity t : targets){
-            targetsRoomId.add(t.getChatRoom().getRoomId());
-        }
-        membersRoomId.retainAll(targetsRoomId);
-        for(Long m : membersRoomId){
-            ChatRoomEntity room =chatRoomRepository.findById(m)
-                    .orElseThrow(() -> new ResourceNotFoundException("존재하지 않은 방입니다."));
-            if(room.getRoomType()== RoomType.DIRECT){
-                return m;
-            }
-        }*/

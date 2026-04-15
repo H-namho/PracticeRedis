@@ -6,7 +6,8 @@ import com.example.swaggerprac.dto.auth.SignupRequestDto;
 import com.example.swaggerprac.exception.ConflictException;
 import com.example.swaggerprac.exception.GlobalExceptionHandler;
 import com.example.swaggerprac.exception.UnauthorizedException;
-import com.example.swaggerprac.security.jwt.JwtAuthenticationFilter;
+import com.example.swaggerprac.security.filter.JwtAuthenticationFilter;
+import com.example.swaggerprac.security.filter.RateLimiterFilter;
 import com.example.swaggerprac.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class AuthControllerTest {
 
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockitoBean
+    private RateLimiterFilter rateLimiterFilter;
 
     @Test
     void signupSuccess() throws Exception {

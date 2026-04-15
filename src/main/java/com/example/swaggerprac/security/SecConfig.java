@@ -1,6 +1,7 @@
-package com.example.swaggerprac.config;
+package com.example.swaggerprac.security;
 
-import com.example.swaggerprac.security.jwt.JwtAuthenticationFilter;
+import com.example.swaggerprac.security.filter.JwtAuthenticationFilter;
+import com.example.swaggerprac.security.filter.RateLimiterFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimiterFilter  rateLimiterFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,6 +42,7 @@ public class SecConfig {
                 ).permitAll()
                 .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(rateLimiterFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

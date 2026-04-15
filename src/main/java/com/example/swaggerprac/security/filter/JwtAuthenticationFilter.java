@@ -1,6 +1,7 @@
-package com.example.swaggerprac.security.jwt;
+package com.example.swaggerprac.security.filter;
 
 import com.example.swaggerprac.redis.BlackListAccessToken;
+import com.example.swaggerprac.security.jwt.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

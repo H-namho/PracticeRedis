@@ -3,8 +3,6 @@ package com.example.swaggerprac.controller;
 import com.example.swaggerprac.dto.post.*;
 import com.example.swaggerprac.entity.enumtype.PostSearchType;
 import com.example.swaggerprac.service.PostService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -27,25 +25,14 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final ObjectMapper objectMapper;
 
-//    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<PostCreateResponseDto> writePost(@RequestPart("data") @Valid PostWriteRequestDto dto,
-//                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files,
-//                                                           Authentication auth
-//    ) {
-//        String username = auth.getName();
-//        return ResponseEntity.status(HttpStatus.CREATED).body(postService.writePost(username, dto, files));
-//    }
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PostCreateResponseDto> writePost(
-            @RequestPart("data") String data,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            Authentication auth
-    ) throws JsonProcessingException {
-        PostWriteRequestDto dto = objectMapper.readValue(data, PostWriteRequestDto.class);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(postService.writePost(auth.getName(), dto, files));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostCreateResponseDto> writePost(@RequestPart("data") @Valid PostWriteRequestDto dto,
+                                                           @RequestPart(value = "files", required = false) List<MultipartFile> files,
+                                                           Authentication auth
+    ) {
+        String username = auth.getName();
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.writePost(username, dto, files));
     }
 
     @GetMapping("/{postId}")
