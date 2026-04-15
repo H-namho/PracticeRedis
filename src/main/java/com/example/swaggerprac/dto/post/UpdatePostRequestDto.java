@@ -1,8 +1,9 @@
 package com.example.swaggerprac.dto.post;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-public record UpdatePostRequestDto(@NotBlank String title,
-                                   @NotBlank String content
-                                   ) {
+public record UpdatePostRequestDto(@NotBlank @Size(max = 100) String title,
+                                   @NotBlank @Size(max = 5000) String content
+                                    ) {
 }

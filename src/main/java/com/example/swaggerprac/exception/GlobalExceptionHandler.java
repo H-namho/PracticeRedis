@@ -1,5 +1,8 @@
 package com.example.swaggerprac.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -22,6 +25,22 @@ public class GlobalExceptionHandler {
         }
 
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException exception) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        for (ConstraintViolation<?> violation : exception.getConstraintViolations()) {
+            errors.put(violation.getPropertyPath().toString(), violation.getMessage());
+        }
+
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<Map<String, String>> handleJsonProcessingException(JsonProcessingException exception) {
+        return ResponseEntity.badRequest().body(Map.of("message", "잘못된 JSON 형식입니다."));
     }
 
     @ExceptionHandler(ConflictException.class)

@@ -121,6 +121,7 @@ public class PostService {
         for (PostAttachment attachment : post.getAttachments()) {
             fileStorageService.delete(attachment.getFilePath());
         }
+        countRepository.delete(postId);
         postRepository.delete(post);
     }
 
