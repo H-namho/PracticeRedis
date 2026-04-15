@@ -26,7 +26,6 @@ public class ChatRoomController {
 
     @PostMapping("/group")
     public ResponseEntity<?> groupCraete(Authentication auth,@RequestBody GroupRoomRequestDto dto){
-        System.out.println(dto.targetIds());
         String username = auth.getName();
         Long roomId = chatRoomService.groupCreate(username,dto);
         return ResponseEntity.ok(roomId);
@@ -37,5 +36,12 @@ public class ChatRoomController {
         String username= auth.getName();
         chatRoomService.deleteRoom(roomId,username);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/myroom")
+    public ResponseEntity getMyRoom(Authentication auth){
+        String username= auth.getName();
+        return ResponseEntity.ok(chatRoomService.myRooms(username));
+
     }
 }

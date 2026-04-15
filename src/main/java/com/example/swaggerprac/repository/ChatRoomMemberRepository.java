@@ -1,7 +1,10 @@
 package com.example.swaggerprac.repository;
 
+import com.example.swaggerprac.dto.room.GetMyRoomResponseDto;
+import com.example.swaggerprac.dto.room.MyRoomIdAndUnreadCountDto;
 import com.example.swaggerprac.entity.ChatRoomEntity;
 import com.example.swaggerprac.entity.ChatRoomMemberEntity;
+import com.example.swaggerprac.entity.enumtype.RoomType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -21,4 +24,18 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMemberEn
            """)
     Optional<ChatRoomEntity> findDirectRoom(Long userId, Long targetId);
     List<ChatRoomMemberEntity> findByChatRoom_RoomId(Long roomId);
+
+    @Query("""
+    select new com.example.swaggerprac.dto.room.GetMyRoomResponseDto(
+        rm.chatRoom.roomId,
+        rm.chatRoom.roomName,
+        rm.chatRoom.roomType,
+        rm.chatRoom.lastMessage,
+        rm.chatRoom.lastMessageAt,
+        rm.unreadCount
+    )
+    from ChatRoomMemberEntity rm
+    where rm.member.id = :id
+""")
+    List<GetMyRoomResponseDto> findMyRooms(Long id);
 }
