@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity,Long> {
 
+    List<ChatRoomEntity> findByCreator_Username(String username);
 }

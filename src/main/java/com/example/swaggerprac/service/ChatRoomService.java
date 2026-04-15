@@ -1,7 +1,9 @@
 package com.example.swaggerprac.service;
 
 import com.example.swaggerprac.dto.room.DirectRoomRequestDto;
+import com.example.swaggerprac.dto.room.GetMyRoomResponseDto;
 import com.example.swaggerprac.dto.room.GroupRoomRequestDto;
+import com.example.swaggerprac.dto.room.MyRoomIdAndUnreadCountDto;
 import com.example.swaggerprac.entity.ChatRoomEntity;
 import com.example.swaggerprac.entity.ChatRoomMemberEntity;
 import com.example.swaggerprac.entity.User;
@@ -18,10 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,6 @@ public class ChatRoomService {
     @Transactional
     public Long directCreate(String username, DirectRoomRequestDto dto) {
 
-        log.info("들어옴");
         User user=userRepository.findByUsername(username)
                 .orElseThrow(()-> new UsernameNotFoundException("회원정보를 찾을 수 없습니다."));
         User target = userRepository.findById(dto.targetId())
@@ -72,9 +70,13 @@ public class ChatRoomService {
         for(User targetUser : targetUsers){
             targetIds.add(targetUser.getId());
         }
+        if(targetIds.size()!=dto.targetIds().size()){
+            throw new IllegalArgumentException("중복된 대상을 초대할 수 없습니다.");
+        }
         if(targetIds.contains(user.getId())){
             throw new IllegalArgumentException("자기자신과 대화할 수 없습니다.");
         }
+
         ChatRoomEntity groupRoom = new ChatRoomEntity(user, dto.roomName(), RoomType.GROUP, dto.isPrivate());
         chatRoomRepository.save(groupRoom);
         ChatRoomMemberEntity roomMember = new ChatRoomMemberEntity(groupRoom,user, ChatMemberRoleType.ADMIN);
@@ -95,5 +97,13 @@ public class ChatRoomService {
         List<ChatRoomMemberEntity> roomMember = chatRoomMemberRepository.findByChatRoom_RoomId(roomId);
         chatRoomMemberRepository.deleteAll(roomMember);
         chatRoomRepository.delete(room);
+    }
+    @Transactional(readOnly = true)
+    public List<GetMyRoomResponseDto> myRooms(String username){
+
+       User user=userRepository.findByUsername(username)
+               .orElseThrow(()->new UsernameNotFoundException("회원정보를 찾을 수 없습니다."));
+       List<GetMyRoomResponseDto> dtos =chatRoomMemberRepository.findMyRooms(user.getId());
+       return dtos;
     }
 }
