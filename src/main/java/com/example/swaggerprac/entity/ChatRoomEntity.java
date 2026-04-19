@@ -17,7 +17,8 @@ public class ChatRoomEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
-
+    @Column(unique = true,nullable = true)
+    private String requestId;
     @JoinColumn(name = "user_id",nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User creator;
@@ -36,6 +37,10 @@ public class ChatRoomEntity extends BaseEntity{
         this.roomName = roomName;
         this.isPrivate = isPrivate;
         this.roomType = roomType;
+    }
+    public ChatRoomEntity(String  requestId, User creator, String roomName, RoomType roomType, boolean isPrivate) {
+        this(creator, roomName, roomType, isPrivate); // 공통 초기화 재사용
+        this.requestId = requestId;
     }
     public void updateLastMessage(String lastMessage,LocalDateTime lastMessageAt){
         this.lastMessage=lastMessage;

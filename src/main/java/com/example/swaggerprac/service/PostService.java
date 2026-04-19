@@ -129,6 +129,7 @@ public class PostService {
         List<PostAttachmentResponseDto> attachments = new ArrayList<>();
         for (PostAttachment attachment : post.getAttachments()) {
             attachments.add(new PostAttachmentResponseDto(
+                    attachment.getId(),
                     attachment.getOriginalFileName(),
                     attachment.getStoredFileName(),
                     attachment.getFilePath(),

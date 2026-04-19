@@ -42,6 +42,6 @@ public class ChatRoomController {
     public ResponseEntity getMyRoom(Authentication auth){
         String username= auth.getName();
         return ResponseEntity.ok(chatRoomService.myRooms(username));
-
     }
+
 }

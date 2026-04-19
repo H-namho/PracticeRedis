@@ -1,6 +1,6 @@
 package com.example.swaggerprac.queryDsl;
 
-import com.example.swaggerprac.entity.SearchRequestDto;
+import com.example.swaggerprac.dto.auth.SearchRequestDto;
 import com.example.swaggerprac.entity.User;
 import com.example.swaggerprac.repository.UserRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;

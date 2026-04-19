@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 public class RateLimiter {
 
     private final StringRedisTemplate redisTemplate;
-    private static final long RATE_LIMIT_TIME_MS =10_000;
-    private static final long MAX_REQUEST = 5;
+    private static final long RATE_LIMIT_TIME_MS = 10_000;
+    private static final long MAX_REQUEST = 30;
 
     public boolean allow(Long userId) {
 

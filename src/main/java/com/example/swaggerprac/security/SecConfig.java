@@ -36,6 +36,8 @@ public class SecConfig {
                         "/api/user/signup",
                         "/api/user/login",
                         "/api/user/refresh",
+                        "/ws",
+                        "/ws/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**"

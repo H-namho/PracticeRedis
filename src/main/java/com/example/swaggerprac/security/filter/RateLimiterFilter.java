@@ -24,10 +24,16 @@ public class RateLimiterFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
+        String method = request.getMethod();
 
         return path.startsWith("/api/user/login")
                 || path.startsWith("/api/user/signup")
                 || path.startsWith("/api/user/refresh")
+                || path.startsWith("/api/user/me")
+                || path.startsWith("/api/user/members")
+                || path.startsWith("/api/room/myroom")
+                || path.startsWith("/readMessage")
+                || ("GET".equalsIgnoreCase(method) && path.startsWith("/api/post"))
                 || path.startsWith("/swagger-ui.html")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs");
