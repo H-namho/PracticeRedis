@@ -33,4 +33,7 @@ public class ChatRoomMemberEntity {
         this.chatMemberRoleType=chatMemberRoleType;
         this.unreadCount=0;
     }
+    public void updateUnreadCount(){
+        this.unreadCount=0;
+    }
 }

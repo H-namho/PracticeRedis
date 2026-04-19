@@ -1,16 +1,13 @@
 package com.example.swaggerprac.repository;
 
 import com.example.swaggerprac.dto.room.GetMyRoomResponseDto;
-import com.example.swaggerprac.dto.room.MyRoomIdAndUnreadCountDto;
 import com.example.swaggerprac.entity.ChatRoomEntity;
 import com.example.swaggerprac.entity.ChatRoomMemberEntity;
-import com.example.swaggerprac.entity.enumtype.RoomType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 @Repository
@@ -37,7 +34,8 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMemberEn
     )
     from ChatRoomMemberEntity rm
     where rm.member.id = :id
-""")
+    ORDER BY rm.chatRoom.lastMessageAt desc,rm.chatRoom.roomId desc
+    """)
     List<GetMyRoomResponseDto> findMyRooms(Long id);
 
     @Query("""
@@ -56,4 +54,14 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMemberEn
 
 
     boolean existsByMember_UsernameAndChatRoom_RoomId(String username, Long roomId);
+
+    ChatRoomMemberEntity findByMember_UsernameAndChatRoom_RoomId(String username, Long roomId);
+
+    @Modifying
+    @Query("""
+           UPDATE ChatRoomMemberEntity rm SET rm.unreadCount =0
+           WHERE rm.member.id=:memberId
+           AND rm.chatRoom.roomId=:roomId
+            """)
+    void UpdateUnraedCount(Long memberId, Long roomId);
 }

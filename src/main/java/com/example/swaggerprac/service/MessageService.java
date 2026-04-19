@@ -46,12 +46,15 @@ public class MessageService {
         simpMessagingTemplate.convertAndSend("/sub/chat/room/"+room.getRoomId(),response);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ReadMessageResponseDto> readMessage(String username,Long roomId,Long lastMessageId){
-        boolean chk = memberRepository.existsByMember_UsernameAndChatRoom_RoomId(username,roomId);
-        if(!chk){
+//        boolean chk = memberRepository.existsByMember_UsernameAndChatRoom_RoomId(username,roomId);
+        ChatRoomMemberEntity roomMember = memberRepository.findByMember_UsernameAndChatRoom_RoomId(username,roomId);
+        if(roomMember==null){
             throw new ForbiddenException("해당 채팅방 멤버만 메시지 조회가 가능합니다.");
         }
+
+        memberRepository.UpdateUnraedCount(roomMember.getMember().getId(),roomId);
         Pageable limit20 =  PageRequest.of(0, 20);
         if(lastMessageId==null){
            return chatMessageRepository.findMessageTop20(roomId,limit20);
@@ -59,5 +62,9 @@ public class MessageService {
         return chatMessageRepository.findLastMessageTop20(roomId,lastMessageId,limit20);
 
 
+    }
+
+    public void deleteMessage(Long roomId) {
+        chatMessageRepository.deleteByChatRoom_RoomId(roomId);
     }
 }

@@ -4,6 +4,7 @@ import com.example.swaggerprac.dto.message.ReadMessageResponseDto;
 import com.example.swaggerprac.entity.ChatMessageEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity,L
 
     @Query("""
             SELECT new com.example.swaggerprac.dto.message.ReadMessageResponseDto(
-                        me.chatRoom.roomId,me.messageId,me.sender.id,me.message,me.createdAt
+                        me.chatRoom.roomId,me.messageId,me.sender.username,me.message,me.createdAt
                         )
             FROM ChatMessageEntity me
             WHERE me.chatRoom.roomId=:roomId ORDER BY me.messageId desc
@@ -30,4 +31,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity,L
             ORDER BY me.messageId desc
             """)
     List<ReadMessageResponseDto> findLastMessageTop20(Long roomId, Long lastMessageId, Pageable limit20);
+
+    void deleteByChatRoom_RoomId(Long roomId);
 }

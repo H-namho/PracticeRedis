@@ -5,6 +5,7 @@ import com.example.swaggerprac.dto.auth.LoginResponseDto;
 import com.example.swaggerprac.dto.auth.MeResponseDto;
 import com.example.swaggerprac.dto.auth.RefreshTokenRequestDto;
 import com.example.swaggerprac.dto.auth.SignupRequestDto;
+import com.example.swaggerprac.dto.auth.UserSummaryResponseDto;
 import com.example.swaggerprac.exception.UnauthorizedException;
 import com.example.swaggerprac.service.AuthService;
 import jakarta.validation.Valid;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -33,6 +36,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody @Valid LoginRequestDto dto) {
+
         return authService.login(dto);
     }
 
@@ -57,5 +61,10 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<MeResponseDto> getMe(Authentication auth) {
         return ResponseEntity.ok(authService.getMe(auth.getName()));
+    }
+
+    @GetMapping("/members")
+    public ResponseEntity<List<UserSummaryResponseDto>> getMembers(Authentication auth) {
+        return ResponseEntity.ok(authService.getMembers(auth.getName()));
     }
 }

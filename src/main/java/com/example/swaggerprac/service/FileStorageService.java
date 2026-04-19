@@ -40,7 +40,14 @@ public class FileStorageService {
             Path targetPath = uploadPath.resolve(storedFileName);
 
             Files.copy(file.getInputStream(),targetPath, StandardCopyOption.REPLACE_EXISTING);
-            return new PostAttachmentResponseDto(originalFileName,storedFileName,targetPath.toString(),file.getContentType(),file.getSize());
+            return new PostAttachmentResponseDto(
+                    null,
+                    originalFileName,
+                    storedFileName,
+                    targetPath.toString(),
+                    file.getContentType(),
+                    file.getSize()
+            );
         }catch (IOException e){
             throw new IllegalArgumentException("파일 저장에 실패했습니다.");
         }
