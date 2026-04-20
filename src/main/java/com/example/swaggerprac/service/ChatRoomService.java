@@ -16,6 +16,7 @@ import com.example.swaggerprac.repository.ChatRoomRepository;
 import com.example.swaggerprac.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class ChatRoomService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final MessageService messageService;
 
     // 추후 반복문없이 쿼리문으로 한방에 DIRECT 같은방 찾기
     @Transactional
@@ -43,19 +45,26 @@ public class ChatRoomService {
             throw new IllegalArgumentException("자기자신과 대화할 수 없습니다.");
         }
 
-        Optional<ChatRoomEntity> originalRoom = chatRoomMemberRepository.findDirectRoom(user.getId(),target.getId());
-        if(originalRoom.isPresent()){
-            return originalRoom.get().getRoomId();
+        Long max = Math.max(user.getId(),target.getId());
+        Long min  = Math.min(user.getId(),target.getId());
+        String requestId = min+"_"+max;
+        Optional<ChatRoomEntity> chkRoom =  chatRoomRepository.findByRequestId(requestId);
+        if(chkRoom.isPresent()){
+            return chkRoom.get().getRoomId();
         }
-
-        ChatRoomEntity newRoom = new ChatRoomEntity(user, dto.roomName(), RoomType.DIRECT, dto.isPrivate());
-        ChatRoomEntity room =chatRoomRepository.save(newRoom);
-        ChatRoomMemberEntity roomMeber =new ChatRoomMemberEntity(room,user, ChatMemberRoleType.ADMIN);
-        chatRoomMemberRepository.save(roomMeber);
-        ChatRoomMemberEntity targetMember = new ChatRoomMemberEntity(room,target,ChatMemberRoleType.MEMBER);
-        chatRoomMemberRepository.save(targetMember);
-
-        return room.getRoomId();
+        try {
+            ChatRoomEntity newRoom = new ChatRoomEntity(requestId, user, dto.roomName(), RoomType.DIRECT, dto.isPrivate());
+            ChatRoomEntity room = chatRoomRepository.save(newRoom);
+            ChatRoomMemberEntity roomMeber = new ChatRoomMemberEntity(room, user, ChatMemberRoleType.ADMIN);
+            chatRoomMemberRepository.save(roomMeber);
+            ChatRoomMemberEntity targetMember = new ChatRoomMemberEntity(room, target, ChatMemberRoleType.MEMBER);
+            chatRoomMemberRepository.save(targetMember);
+            return room.getRoomId();
+        }catch (DataIntegrityViolationException e) {
+            ChatRoomEntity room = chatRoomRepository.findByRequestId(requestId)
+                    .orElseThrow(() -> e);
+            return room.getRoomId();
+        }
     }
     @Transactional
     public Long groupCreate(String username, GroupRoomRequestDto dto) {
@@ -94,6 +103,7 @@ public class ChatRoomService {
         if(!room.getCreator().getUsername().equals(username)){
             throw new ForbiddenException("관리자만 채팅방을 삭제할 수 있습니다.");
         }
+        messageService.deleteMessage(roomId);
         List<ChatRoomMemberEntity> roomMember = chatRoomMemberRepository.findByChatRoom_RoomId(roomId);
         chatRoomMemberRepository.deleteAll(roomMember);
         chatRoomRepository.delete(room);
