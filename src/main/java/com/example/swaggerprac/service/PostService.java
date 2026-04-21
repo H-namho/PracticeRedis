@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -71,8 +72,8 @@ public class PostService {
     public ReadPostResponseDto readPost(Long postId) {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("게시글정보를 찾을 수 없습니다"));
-        countRepository.increase(post.getPostId());
-        return toReadPostResponseDto(post);
+        long redisCount =countRepository.increase(post.getPostId());
+        return toReadPostResponseDto(post,redisCount);
     }
 
     @Transactional
@@ -86,7 +87,7 @@ public class PostService {
         }
 
         post.updatePost(dto.title(), dto.content());
-        return toReadPostResponseDto(post);
+        return toReadPostResponseDto(post, countRepository.getCount(postId));
     }
 
     @Transactional(readOnly = true)
@@ -95,13 +96,19 @@ public class PostService {
         long totalCount = postRepository.countSearch(dto);
         long totalPage = (totalCount + dto.size() - 1) / dto.size();
 
+        List<Long> postIds = new ArrayList<>();
+        for(PostEntity p : posts){
+            postIds.add(p.getPostId());
+        }
+        Map<Long,Long> counts = countRepository.getCounts(postIds);
+
         List<PostSummaryResponseDto> content = new ArrayList<>();
         for (PostEntity post : posts) {
             content.add(new PostSummaryResponseDto(
                     post.getPostId(),
                     post.getTitle(),
                     post.getWriter().getUsername(),
-                    (int)countRepository.getCount(post.getPostId())+post.getViewCount(),
+                    (int) (counts.getOrDefault(post.getPostId(), 0L)+post.getViewCount()),
                     post.getCreatedAt()
             ));
         }
@@ -125,7 +132,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    private ReadPostResponseDto toReadPostResponseDto(PostEntity post) {
+    private ReadPostResponseDto toReadPostResponseDto(PostEntity post,Long redisCount) {
         List<PostAttachmentResponseDto> attachments = new ArrayList<>();
         for (PostAttachment attachment : post.getAttachments()) {
             attachments.add(new PostAttachmentResponseDto(
@@ -138,13 +145,13 @@ public class PostService {
             ));
         }
 
-        int viewCount = post.getViewCount() + (int)countRepository.getCount(post.getPostId());
+        long viewCount = post.getViewCount() + redisCount;
 
         return new ReadPostResponseDto(
                 post.getTitle(),
                 post.getWriter().getUsername(),
                 post.getContent(),
-                viewCount,
+                (int)viewCount,
                 post.getCreatedAt(),
                 attachments
         );

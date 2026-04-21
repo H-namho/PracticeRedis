@@ -44,7 +44,6 @@ public class ChatRoomService {
         if(user.getId().equals(dto.targetId())){
             throw new IllegalArgumentException("자기자신과 대화할 수 없습니다.");
         }
-
         Long max = Math.max(user.getId(),target.getId());
         Long min  = Math.min(user.getId(),target.getId());
         String requestId = min+"_"+max;
@@ -104,10 +103,12 @@ public class ChatRoomService {
             throw new ForbiddenException("관리자만 채팅방을 삭제할 수 있습니다.");
         }
         messageService.deleteMessage(roomId);
-        List<ChatRoomMemberEntity> roomMember = chatRoomMemberRepository.findByChatRoom_RoomId(roomId);
-        chatRoomMemberRepository.deleteAll(roomMember);
+        chatRoomMemberRepository.deleteMember(roomId);
+//        List<ChatRoomMemberEntity> roomMember = chatRoomMemberRepository.findByChatRoom_RoomId(roomId);
+//        chatRoomMemberRepository.deleteAll(roomMember);
         chatRoomRepository.delete(room);
     }
+
     @Transactional(readOnly = true)
     public List<GetMyRoomResponseDto> myRooms(String username){
 
