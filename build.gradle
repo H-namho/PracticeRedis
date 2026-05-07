@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+    // 메일센더
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     // ================================
     // 웹
     // ================================

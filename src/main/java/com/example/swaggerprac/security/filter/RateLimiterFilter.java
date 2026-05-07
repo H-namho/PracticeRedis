@@ -55,11 +55,11 @@ public class RateLimiterFilter extends OncePerRequestFilter {
             if (!rateLimiter.allow(userId)) {
                 response.setStatus(429);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter().write("{\"message\":\"Too many requests.\"}");
+                response.getWriter().write("{\"message\":\"잠시 기다렸다가 요청해주세요.\"}");
                 return;
             }
         } catch (JwtException | IllegalArgumentException exception) {
-            // 인증 실패 판단은 JWT 필터와 Security가 담당하고, RateLimiter는 요청 제한만 담당합니다.
+            // 인증 실패 판단은 JWT 필터와 Security가 담당하고, RateLimiter는 요청만 담당
             filterChain.doFilter(request, response);
             return;
         }

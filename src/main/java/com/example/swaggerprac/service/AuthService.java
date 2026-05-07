@@ -11,6 +11,7 @@ import com.example.swaggerprac.exception.ConflictException;
 import com.example.swaggerprac.exception.ResourceNotFoundException;
 import com.example.swaggerprac.exception.UnauthorizedException;
 import com.example.swaggerprac.redis.BlackListAccessToken;
+import com.example.swaggerprac.redis.EmailRedisRepository;
 import com.example.swaggerprac.redis.RefreshTokenRedisRepository;
 import com.example.swaggerprac.repository.UserRepository;
 import com.example.swaggerprac.security.jwt.JwtUtil;
@@ -21,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -34,6 +37,7 @@ public class AuthService {
     private final RefreshTokenRedisRepository refreshTokenRedisRepository;
     private final BlackListAccessToken blackListAccessToken;
     private final UserDetailsService userDetailsService;
+    private final EmailService emailService;
 
     @Transactional
     public Long signup(SignupRequestDto dto) {
@@ -43,7 +47,9 @@ public class AuthService {
         if (userRepository.existsByEmail(dto.email())) {
             throw new ConflictException("이미 사용중인 이메일입니다.");
         }
-
+        if(!emailService.validateVerifiedEmail(dto.email())){
+            throw new UnauthorizedException("이메일 인증이 완료되지 않았습니다.");
+        };
         String encodedPassword = passwordEncoder.encode(dto.password());
         User user = new User(
                 dto.username(),
@@ -53,7 +59,17 @@ public class AuthService {
                 RoleType.ROLE_USER
         );
         userRepository.save(user);
+        emailService.consumeVerifiedEmail(dto.email());
+
+        // 이벤트 퍼블리셔로도 가능. 이벤트 퍼블리셔가 오히려 책임분리에 더좋음
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                emailService.welcomeMail(dto.email(),dto.username());
+            }
+        });
         return user.getId();
+
     }
 
     @Transactional(readOnly = true)
@@ -84,7 +100,6 @@ public class AuthService {
             if (!tokenUsername.equals(username)) {
                 throw new UnauthorizedException("유효하지 않은 요청입니다.");
             }
-
 
             blackListAccessToken.blacklist(accessToken);
             refreshTokenRedisRepository.delete(userId);
@@ -142,21 +157,7 @@ public class AuthService {
     // jpql로 수정예정
     @Transactional(readOnly = true)
     public List<UserSummaryResponseDto> getMembers(String username) {
-        List<User> users = userRepository.findAll();
-        List<UserSummaryResponseDto> members = new java.util.ArrayList<>();
 
-        for (User user : users) {
-            if (user.getUsername().equals(username)) {
-                continue;
-            }
-
-            members.add(new UserSummaryResponseDto(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail()
-            ));
-        }
-
-        return members;
+        return userRepository.findAllUsers(username);
     }
 }

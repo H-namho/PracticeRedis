@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
@@ -43,7 +45,14 @@ public class MessageService {
 
         SendMessageResponseDto response = new SendMessageResponseDto(room.getRoomId(),Message.getMessageId()
                 ,sender,Message.getMessage(),Message.getCreatedAt());
-        simpMessagingTemplate.convertAndSend("/sub/chat/room/"+room.getRoomId(),response);
+
+        // 롤백됐는데 메시지가 보내지면안됌, 커밋후 메시지 브로드캐스팅
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                simpMessagingTemplate.convertAndSend("/sub/chat/room/"+room.getRoomId(),response);
+            }
+        });
     }
 
     @Transactional

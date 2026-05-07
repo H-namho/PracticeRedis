@@ -33,6 +33,7 @@ public class SecConfig {
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(
+                        "/email/**",
                         "/api/user/signup",
                         "/api/user/login",
                         "/api/user/refresh",

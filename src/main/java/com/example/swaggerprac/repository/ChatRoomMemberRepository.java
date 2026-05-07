@@ -6,6 +6,7 @@ import com.example.swaggerprac.entity.ChatRoomMemberEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -64,4 +65,11 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMemberEn
            AND rm.chatRoom.roomId=:roomId
             """)
     void UpdateUnraedCount(Long memberId, Long roomId);
+
+    @Modifying
+    @Query("""
+            DELETE FROM ChatRoomMemberEntity rm 
+            WHERE rm.chatRoom.roomId = :roomId
+            """)
+    void deleteMember(@Param("roomId") Long roomId);
 }

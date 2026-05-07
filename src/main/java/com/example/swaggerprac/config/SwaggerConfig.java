@@ -15,8 +15,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Open Board API 문서")
-                        .description("커뮤니티 게시판 서비스 API")
+                        .title("사내 메신저 API 문서")
+                        .description("사내 메신저 및 게시판 API")
                         .version("1.0"))
                 // 전체 API 문서에 bearerAuth 보안 요구사항 적용
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))

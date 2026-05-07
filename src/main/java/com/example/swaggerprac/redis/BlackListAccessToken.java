@@ -23,7 +23,7 @@ public class BlackListAccessToken {
     }
 
     public boolean contains(String accessToken) {
-        return Boolean.TRUE.equals(template.hasKey(getBlacklistKey(accessToken)));
+        return template.hasKey(getBlacklistKey(accessToken));
     }
 
     private String getBlacklistKey(String accessToken) {
